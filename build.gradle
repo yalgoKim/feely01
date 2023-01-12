@@ -1,0 +1,54 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.7'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'com.project'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
+	compileOnly 'org.projectlombok:lombok'
+
+	runtimeOnly 'org.postgresql:postgresql'
+
+	implementation 'mysql:mysql-connector-java'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Spring Validation
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.5.6'
+
+
+	// Spring Security Jwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+	// H2 database
+	implementation 'com.h2database:h2'
+	runtimeOnly 'com.h2database:h2'
+
+	// Swagger
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	implementation("io.springfox:springfox-swagger2:2.9.2"){
+		exclude module: 'swagger-annotation'
+		exclude module: 'swagger-models'
+	}
+	implementation('io.swagger:swagger-annotations:1.6.6')
+	implementation('io.swagger:swagger-models:1.6.6')
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

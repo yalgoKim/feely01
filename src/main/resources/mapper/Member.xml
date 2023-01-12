@@ -1,0 +1,16 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.feeely.mapper.MemberMapper">
+
+<!--    int findByIdCount(String id);-->
+<!--    int userSave(MemberSignupRequest memberSignupRequest); 이거 mapper 인터페이스에서 데려온거임 성공하면 1로 리턴함 #{전달받은 매개변수 이름과 맞춰야함} -->
+
+    <select id="findByIdCount" parameterType="string" resultType="INTEGER">
+        select count(id) from users where id = #{id}
+    </select>
+
+    <insert id="userSave" parameterType="memberSignupRequest" >
+        insert into users (id, name, password)
+            values (#{id}, #{name}, #{password})
+    </insert>
+
+</mapper>
