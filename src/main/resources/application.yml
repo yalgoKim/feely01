@@ -1,6 +1,9 @@
 spring:
   profiles:
     default: local
+  jwt:
+    header: Authorization
+    secret: eWFsZ29faXNfZnJlZQ==   # https://www.convertstring.com/ko/EncodeDecode/Base64Encode -> yalgo_is_free
   mvc:
     path match:
       matching-strategy: ant_path_matcher
