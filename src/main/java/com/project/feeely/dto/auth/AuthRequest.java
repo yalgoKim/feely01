@@ -7,10 +7,10 @@ import java.util.List;
 
 @AllArgsConstructor
 @ToString
-@Getter
-@Setter
+@Data
 public class AuthRequest {
 
     private String id;
     private List<GrantedAuthority> authorities;
+
 }

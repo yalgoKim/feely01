@@ -1,6 +1,8 @@
 package com.project.feeely.util.auth;
 
 import com.project.feeely.dto.auth.AuthRequest;
+import com.project.feeely.dto.auth.Member;
+import com.project.feeely.dto.enums.Roles;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -28,11 +30,11 @@ public class JwtUtil {
 //    그리고 해싱된 값을 다시 Base64로 인코딩하여 생성합니다. 그리고 우리는 yml에 이걸 미리 지정해뒀음~
 
     // 유저정보 가져오기
-    public AuthRequest getMember() {
+    public Member getMember() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof String) {
             return null;
         }
-        return (AuthRequest) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
     // 우리가 흔히 하는 아이디/패스워드 사용자 정보를 넣고 실제 가입된 사용자인지 체크한후 인증에 성공하면
     // 사용자의 principal과 credential 정보를 Authentication에 담는다.
@@ -45,10 +47,10 @@ public class JwtUtil {
 
 
     // JWT 토큰 생성
-    public String generateToken(String id, String type) {
+    public String generateToken(long idx, Roles role) {
         return Jwts.builder()
-                .claim("id", id) // claim :
-                .claim("TYPE", type)
+                .claim("idx", idx) // claim :
+                .claim("Role", role.getRole())
                 .setIssuedAt(new Date()) // 토큰 발행 시간 정보
                 .setExpiration(getExpiration()) // 만료시간 세팅
                 .signWith(getKey()) // secret값 세팅
@@ -83,15 +85,15 @@ public class JwtUtil {
     }
 
     // 토큰에서 회원 아이디 추출
-    public String getUserId(String token) {
+    public Long getUserIdx(String token) {
         Claims claims = getClaims(token);
-        return claims.get("id", String.class);
+        return claims.get("idx", Long.class);
     }
 
     // 토큰에서 회원 타입(?) 추출
-    public String getType(String token) {
+    public String getRole(String token) {
         Claims claims = getClaims(token);
-        return claims.get("TYPE", String.class);
+        return claims.get("ROLE", String.class);
     }
 
     // 뭔가.. 토큰의 몸통을 가져오는 작업일까..

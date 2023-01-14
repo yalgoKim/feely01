@@ -10,7 +10,7 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    jdbc-url: jdbc:mysql://localhost:3306/feeely?serverTimezone=UTC&characterEncoding=UTF-8
+    jdbc-url: jdbc:mysql://localhost:3306/feely?serverTimezone=UTC&characterEncoding=UTF-8
     username: yalgo
     password: 1234
 

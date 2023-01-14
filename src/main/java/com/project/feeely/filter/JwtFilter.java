@@ -2,8 +2,11 @@ package com.project.feeely.filter;
 
 import com.project.feeely.dto.auth.AuthCheckRequest;
 import com.project.feeely.dto.auth.AuthRequest;
+import com.project.feeely.dto.auth.Member;
+import com.project.feeely.dto.enums.ErrorCode;
 import com.project.feeely.dto.enums.Roles;
 import com.project.feeely.service.auth.AuthService;
+import com.project.feeely.service.auth.AuthorizationService;
 import com.project.feeely.util.auth.JwtUtil;
 import com.project.feeely.util.auth.URLMatcher;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -23,83 +29,96 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 // OncePerRequestFilter : 어느 서블릿 컨테이너에서나 요청 당 한 번의 실행을 보장하는 것을 목표로 한다.
 //                          doFilterInternal메소드와 HttpServletRequest와 HttpServletResponse인자를 제공한다.
-
-    @Value("Authorization")
-    private String SPRING_JWT_HEADER;
+@Value("${spring.jwt.header}")
+private String SPRING_JWT_HEADER;
 
     private JwtUtil jwtUtil;
-    private AuthService authService;
 
+    private AuthorizationService authorizationService;
 
     @Autowired
-    public void setJwtUtil(JwtUtil jwtUtil) {
+    public void setAuthorizationService(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
+    }
+
+    @Autowired
+    public void setJwtUtil(JwtUtil jwtUtil){
         this.jwtUtil = jwtUtil;
     }
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         if ("OPTIONS".equals(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK); // SC_OK : 상태 200일때 ~
+            response.setStatus(HttpServletResponse.SC_OK);  // SC_OK : 상태 200일때 ~
+            return;
+        }
+
+        URLMatcher saveUrlMatcher = new URLMatcher(List.of("/member/user/signup"));
+        if(saveUrlMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        URLMatcher loginUrlMatcher = new URLMatcher(List.of("/auth/user/login"));
+        if(loginUrlMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         final String token = request.getHeader(SPRING_JWT_HEADER);
-        URLMatcher userMatcher = new URLMatcher(List.of("/user/**"));   // 관리자
+        URLMatcher anyUrlMatcher = new URLMatcher(List.of("/auth/user/**"));
+        if(anyUrlMatcher.matches(request)){
 
-        if (userMatcher.matches(request)) {
-            // 토큰이 없는 경우 에러
-            if (token == null) {
-                throw new IllegalArgumentException("토큰이 없습니다.");
+            if(token == null){;
+                error(ErrorCode.UNAUTHORIZED);
+                return;
             }
 
             try {
                 if (!jwtUtil.validateToken(token)) {
-                    throw new IllegalArgumentException("토큰이 만료되었습니다.");
+                    error(ErrorCode.EXPIRED_TOKEN);
+                    return;
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException("서버오류");
+                error(ErrorCode.INVALID_TOKEN);
+                return;
             }
 
-
-            if (token != null) {
-                // Role 설정
-                List<GrantedAuthority> authorities = new ArrayList<>();
-
-                // 관리자 AuthController 에서 받아서 처리할 때 "user" 를 타이프로 주면 어드민 인거 체크함.
-                if ("user".equals(jwtUtil.getType(token))) {
-                    // 관리자 정보 조회
-                    AuthCheckRequest authCheckRequest = authService.authMemberDetail(jwtUtil.getUserId(token));
-
-                    if (authCheckRequest == null) {
-                        throw new IllegalArgumentException("유저가 존재하지 않습니다.");
-                    }
-
-                    List<String> authList = authCheckRequest.getAuth();
-                    for (String auth : authList) {
-                        if (auth.equals("ROLE_USER")) {
-                            authorities.add(new SimpleGrantedAuthority(Roles.USER.toString()));
-                        } else {
-                            throw new IllegalStateException("유효한 권한이 존재하지 않습니다.");
-                        }
-                    }
+            if (token != null){
+                Map<String, ?> resultMap = authorizationService.memberAuthorizationFindById(jwtUtil.getUserIdx(token));
+                if(resultMap.isEmpty()){
+                    error(ErrorCode.NOT_FOUND_USER);
+                    return;
                 }
-
-                // 세션 저장
-                AuthRequest member = new AuthRequest(jwtUtil.getUserId(token) , authorities);
-
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
+                Member member = Member.memberAuthorizationFindByIdVo(resultMap);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken( member, null,  member.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                filterChain.doFilter(request, response);
+                return;
             }
+
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void error(ErrorCode code) throws IOException {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+
+
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
+
+
+        response.sendRedirect(request.getContextPath() + "/error/" + code.getValue());
     }
 
 }

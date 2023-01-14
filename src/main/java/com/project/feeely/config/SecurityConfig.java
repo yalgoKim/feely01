@@ -1,5 +1,6 @@
 package com.project.feeely.config;
 
+import com.project.feeely.filter.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -7,10 +8,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.Filter;
 import java.util.List;
 
 @EnableWebSecurity
@@ -41,16 +44,24 @@ public class SecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 쿠키에 얘를 넣고 왔다갔다 하는거라 무상태 처리..?
                 .and()
                 .authorizeRequests()
+                .antMatchers("/auth/user/**").hasAnyRole("ROLE_USER")
                 .anyRequest()
                 .permitAll()
                 .and()
                 .csrf().disable();
+        http.addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter();
+    }
+
     // security에 영향을 받지 않는 url을 잡아주겠다 (index 넣어줌 test로)
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/");
+    @Bean
+    public WebSecurityCustomizer customWebSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/csrf", "/", "/swagger-resources/", "/swagger-ui.html/", "/v2/api-docs/", "/webjars/");
     }
 }
+

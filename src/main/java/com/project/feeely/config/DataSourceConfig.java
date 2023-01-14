@@ -1,5 +1,6 @@
 package com.project.feeely.config;
 
+import com.project.feeely.dto.enums.Roles;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -33,6 +34,7 @@ public class DataSourceConfig {
         // MyBatis Alias , xml Source Mapping
         sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources(Path)); // applicationContext : spring의 실행 환경, 여기서 getResources 하겠다 : PATH 경로에 있는 xml을 다 path로 읽겠다
         sqlSessionFactoryBean.setTypeAliasesPackage("com.project.feeely.dto"); // mapper의 parametertype 패키지를 잘라준거
+        sqlSessionFactoryBean.setTypeHandlers(new Roles.TypeHandler()); // 여러개 넣고싶으면 배열로 넣으면 됩니다
         return sqlSessionFactoryBean.getObject();
     }
 

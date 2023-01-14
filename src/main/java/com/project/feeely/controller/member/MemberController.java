@@ -39,4 +39,5 @@ public class MemberController {
                 .total(1) // 결과값이 한개, 리스트면 리스트 수
                 .build(); // 서비스에 있는 인티저가 response 로 들어감
     }
+
 }
