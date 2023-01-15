@@ -3,7 +3,7 @@ spring:
     default: local
   jwt:
     header: Authorization
-    secret: eWFsZ29faXNfZnJlZQ==   # https://www.convertstring.com/ko/EncodeDecode/Base64Encode -> yalgo_is_free
+    secret: SSBsb3ZlIHlvdSwgYmFieSBhbmQgaWYgaXQncyBxdWl0ZSBhbHJpZ2h0DQpJIG5lZWQgeW91LCBiYWJ5IHRvIHdhcm0gdGhlIGxvbmVseSBuaWdodHMNCkkgbG92ZSB5b3UsIGJhYnksIHRydXN0IGluIG1lIHdoZW4gSSBzYXkNCk9oLCBwcmV0dHkgYmFieSwgZG9uJ3QgYnJpbmcgbWUgZG93biBJIHByYXkNCk9oLCBwcmV0dHkgYmFieSwgbm93IHRoYXQgSSd2ZSBmb3VuZCB5b3Ugc3RheQ0KTGV0IG1lIGxvdmUgeW91LCBiYWJ5LCBsZXQgbWUgbG92ZSB5b3U=
   mvc:
     path match:
       matching-strategy: ant_path_matcher

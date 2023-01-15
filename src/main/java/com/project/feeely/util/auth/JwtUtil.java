@@ -21,7 +21,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     // JwtUtil : JWT를 생성하고 검증하는 역할을 수행함
-    @Value("eWFsZ29faXNfZnJlZQ==")
+    @Value("SSBsb3ZlIHlvdSwgYmFieSBhbmQgaWYgaXQncyBxdWl0ZSBhbHJpZ2h0DQpJIG5lZWQgeW91LCBiYWJ5IHRvIHdhcm0gdGhlIGxvbmVseSBuaWdodHMNCkkgbG92ZSB5b3UsIGJhYnksIHRydXN0IGluIG1lIHdoZW4gSSBzYXkNCk9oLCBwcmV0dHkgYmFieSwgZG9uJ3QgYnJpbmcgbWUgZG93biBJIHByYXkNCk9oLCBwcmV0dHkgYmFieSwgbm93IHRoYXQgSSd2ZSBmb3VuZCB5b3Ugc3RheQ0KTGV0IG1lIGxvdmUgeW91LCBiYWJ5LCBsZXQgbWUgbG92ZSB5b3U===")
     private String SPRING_JWT_SECRET;
 
 //    서명은 비밀키를 포함하여 암호화되어있음.

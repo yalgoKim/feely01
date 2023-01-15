@@ -1,11 +1,7 @@
 package com.project.feeely.filter;
 
-import com.project.feeely.dto.auth.AuthCheckRequest;
-import com.project.feeely.dto.auth.AuthRequest;
 import com.project.feeely.dto.auth.Member;
 import com.project.feeely.dto.enums.ErrorCode;
-import com.project.feeely.dto.enums.Roles;
-import com.project.feeely.service.auth.AuthService;
 import com.project.feeely.service.auth.AuthorizationService;
 import com.project.feeely.util.auth.JwtUtil;
 import com.project.feeely.util.auth.URLMatcher;
@@ -13,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.context.request.RequestAttributes;
@@ -27,7 +21,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

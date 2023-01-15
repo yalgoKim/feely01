@@ -44,7 +44,7 @@ public class SecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 쿠키에 얘를 넣고 왔다갔다 하는거라 무상태 처리..?
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/user/**").hasAnyRole("ROLE_USER")
+//                .antMatchers("/auth/user/**").hasAnyRole("USER_001")
                 .anyRequest()
                 .permitAll()
                 .and()
